@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { loadFromStorage } from "../services/localStorage";
 import MovieCard from "../components/MovieCard";
 import { searchMovies } from "../services/api";
-function WatchList (){
+function Favourites (){
   const [movies, setMovies] = useState([]);
     useEffect(() => {
       const fetchMovies = async () => {
@@ -11,7 +11,7 @@ function WatchList (){
       };
       fetchMovies();
     }, []);
-    const data=loadFromStorage("watchlist", []);
+    const data=loadFromStorage("favorites", []);
     console.log(data);
   return(
     <div>
@@ -26,4 +26,4 @@ function WatchList (){
     </div>
   )
 }
-export default WatchList;
+export default Favourites;

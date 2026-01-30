@@ -1,35 +1,51 @@
-import { API_BASE_URL, API_KEY } from "../utils/constants";
+// src/services/api.js
+const API_KEY = import.meta.env.VITE_OMDB_API_KEY;
+const BASE_URL = "https://www.omdbapi.com/";
 
-/**
- * Search movies by title
- * @param {string} searchTerm - Movie title to search
- * @param {number} page - Page number (default: 1)
- * @param {string} type - Movie type filter (default: '')
- * @param {string} year - Year filter (default: '')
- * @returns {Promise<Object>} Search results
- */
 export const searchMovies = async (
   searchTerm,
   page = 1,
   type = "",
   year = "",
 ) => {
-  // TODO: Implement API call
-  // Build URL with query parameters
-  // Handle response
-  // Throw error if Response is "False"
-  throw new Error("searchMovies not implemented");
+  if (!API_KEY) {
+    throw new Error("Missing OMDB API key. Set VITE_OMDB_API_KEY.");
+  }
+
+  const params = new URLSearchParams({
+    apikey: API_KEY,
+    s: searchTerm || "avengers",
+    page: page.toString(),
+    ...(type && type !== "all" && { type }),
+    ...(year && year !== "all" && { y: year }),
+  });
+
+  const response = await fetch(`${BASE_URL}?${params.toString()}`);
+  const data = await response.json();
+
+  if (data.Response === "False") {
+    throw new Error(data.Error);
+  }
+
+  return data;
 };
 
-/**
- * Get movie details by IMDb ID
- * @param {string} imdbID - IMDb ID of the movie
- * @returns {Promise<Object>} Movie details
- */
 export const getMovieDetails = async (imdbID) => {
-  // TODO: Implement API call
-  // Fetch movie by ID with plot=full
-  // Handle response
-  // Throw error if Response is "False"
-  throw new Error("getMovieDetails not implemented");
+  if (!API_KEY) {
+    throw new Error("Missing OMDB API key. Set VITE_OMDB_API_KEY.");
+  }
+
+  const params = new URLSearchParams({
+    apikey: API_KEY,
+    i: imdbID,
+    plot: "full",
+  });
+  const response = await fetch(`${BASE_URL}?${params.toString()}`);
+  const data = await response.json();
+
+  if (data.Response === "False") {
+    throw new Error(data.Error);
+  }
+
+  return data;
 };
