@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import { useNavigate } from "react-router-dom";
 import fav from "../assets/love.png";
 import bookmark from "../assets/save.png";
 import liked from "../assets/liked.jpg";
@@ -8,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleFavorite, addToWatchlist, removeFromWatchlist } from "../store/slices/userSlice";
 // import { useState } from "react";
 function MovieCard({ movie }) {
+    const navigate = useNavigate();
     const [favourite, setFavourite]=useState(fav);
     const [watchlist, setWatchlist]=useState(bookmark);
     const dispatch = useDispatch();
@@ -20,14 +22,15 @@ function MovieCard({ movie }) {
         watchlist===bookmark?setWatchlist(saved):setWatchlist(bookmark);
     }
   return (
-    <div className="max-w-sm rounded overflow-hidden shadow-lg m-4">
+    <div className="max-w-sm rounded overflow-hidden shadow-lg m-4 cursor-pointer transition hover:shadow-xl">
         <img
-          className="w-full h-64 object-cover"
+          className="w-full h-64 object-cover cursor-pointer"
           src={getPosterUrl(movie?.Poster)}
           alt={movie?.Title || "Movie Poster"}
+          onClick={() => navigate(`/movie/${movie.imdbID}`)}
         />
         <div className="px-6 py-4">
-            <div className="font-bold text-xl mb-2">{movie.Title}</div> 
+            <div className="font-bold text-xl mb-2 cursor-pointer hover:text-blue-600" onClick={() => navigate(`/movie/${movie.imdbID}`)}>{movie.Title}</div> 
             <p className="text-gray-700 text-base">Year: {movie.Year}</p>
             <div className="mt-3 flex items-center gap-3">
               <button onClick={() => handlefav(movie.imdbID)}><img

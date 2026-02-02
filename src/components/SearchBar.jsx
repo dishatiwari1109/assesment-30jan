@@ -1,46 +1,32 @@
-import React, { useEffect, useState } from "react";
-import { useDebounce } from "../hooks/useDebounce";
-import { searchMovies } from "../services/api";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function SearchBar({ onSearch }) {
+export default function SearchBar() {
   const [val, setVal] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [data, setData]=useState([]);
-  const debouncedSearchTerm = useDebounce(val, 500);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!debouncedSearchTerm.trim()) {
-      onSearch?.({ Search: [], totalResults: "0" });
-      return;
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (val.trim()) {
+      navigate(`/search?q=${encodeURIComponent(val)}`);
     }
-
-    const fetchMovies = async () => {
-      try {
-        setLoading(true);
-        const dataa = await searchMovies(debouncedSearchTerm, 1);
-        console.log(dataa);
-        setData(dataa);
-        onSearch?.(dataa);
-      } catch (error) {
-        console.error("Search error:", error);
-        onSearch?.({ Search: [], totalResults: "0", error: error.message });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMovies();
-  }, [debouncedSearchTerm, onSearch]);
+  };
 
   return (
-    <input
-      type="text"
-      placeholder="Search Movie"
-      className="border px-3 py-2 rounded w-64"
-      value={val}
-      onChange={(e) => setVal(e.target.value)}
-      disabled={loading}
-    />
-
+    <form onSubmit={handleSearch} className="flex gap-2">
+      <input
+        type="text"
+        placeholder="Search Movie"
+        className="border px-3 py-2 rounded w-64"
+        value={val}
+        onChange={(e) => setVal(e.target.value)}
+      />
+      <button
+        type="submit"
+        className="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition"
+      >
+        Search
+      </button>
+    </form>
   );
 }

@@ -1,44 +1,100 @@
 import React, { useEffect, useState } from "react";
-import { useDebounce } from "../hooks/useDebounce";
+import { useSearchParams } from "react-router-dom";
 import { searchMovies } from "../services/api";
+import MovieCard from "../components/MovieCard";
+import Pagination from "../components/Pagination";
+import LoadingSkeleton from "../components/LoadingSkeleton";
 
-export default function SearchResults({ onSearch }) {
-  const [val, setVal] = useState("");
+export default function SearchResults() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [data, setData]=useState([]);
-  const debouncedSearchTerm = useDebounce(val, 500);
+  const [error, setError] = useState(null);
+  const [totalResults, setTotalResults] = useState(0);
+  const searchTerm = searchParams.get("q");
+  const currentPage = parseInt(searchParams.get("page") || "1");
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(totalResults / itemsPerPage);
 
   useEffect(() => {
-    if (!debouncedSearchTerm.trim()) {
-      onSearch?.({ Search: [], totalResults: "0" });
+    if (!searchTerm) {
+      setMovies([]);
+      setTotalResults(0);
       return;
     }
 
     const fetchMovies = async () => {
       try {
         setLoading(true);
-        const dataa = await searchMovies(debouncedSearchTerm, 1);
-        console.log(dataa);
-        setData(dataa);
-        onSearch?.(dataa);
-      } catch (error) {
-        console.error("Search error:", error);
-        onSearch?.({ Search: [], totalResults: "0", error: error.message });
+        const data = await searchMovies(searchTerm, currentPage);
+        setMovies(data.Search || []);
+        setTotalResults(parseInt(data.totalResults) || 0);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+        setMovies([]);
+        setTotalResults(0);
       } finally {
         setLoading(false);
       }
     };
 
     fetchMovies();
-  }, [debouncedSearchTerm, onSearch]);
+  }, [searchTerm, currentPage]);
+
+  const handlePageChange = (page) => {
+    setSearchParams({ q: searchTerm, page: page.toString() });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  if (!searchTerm) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-gray-500 text-xl">Enter a search term to find movies</p>
+      </div>
+    );
+  }
+
+  if (loading) return <LoadingSkeleton />;
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-red-500 text-xl">Error: {error}</p>
+      </div>
+    );
+  }
+
+  if (movies.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-gray-500 text-xl">No movies found for "{searchTerm}"</p>
+      </div>
+    );
+  }
 
   return (
-    <>
-    {data.map((movie) => (
-      <div key={movie.imdbID}>
-        <MovieCard movie={movie} />
+    <div className="p-4">
+      <h1 className="text-3xl font-bold mb-2">
+        Search Results for "{searchTerm}"
+      </h1>
+      <p className="text-gray-600 mb-6">
+        Found {totalResults} movies • Page {currentPage} of {totalPages}
+      </p>
+      <div className="grid grid-cols-3 gap-4">
+        {movies.map((movie) => (
+          <div key={movie.imdbID}>
+            <MovieCard movie={movie} />
+          </div>
+        ))}
       </div>
-    ))}
-    </>
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      )}
+    </div>
   );
 }

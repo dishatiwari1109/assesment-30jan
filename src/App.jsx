@@ -8,6 +8,8 @@ import Header from './components/Header';
 import Home from './pages/Home';
 import Favourites from './pages/Favourites'
 import NotFound from './pages/NotFound';
+import SearchResults from './pages/SearchResults';
+import MovieDetails from './pages/MovieDetails';
 
 import './App.css';
 
@@ -19,9 +21,8 @@ function App() {
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />
-            {/* TODO: Add other routes */}
-            {/* <Route path="/search" element={<SearchResults />} /> */}
-            {/* <Route path="/movie/:imdbID" element={<MovieDetails />} /> */}
+            <Route path="/search" element={<SearchResults />} />
+            <Route path="/movie/:imdbID" element={<MovieDetails />} />
             <Route path="/watchlist" element={<WatchList />} />
             <Route path="/favourites" element={<Favourites />} />
             <Route path="*" element={<NotFound />} />
