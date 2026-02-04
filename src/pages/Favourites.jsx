@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { loadFromStorage } from "../services/localStorage";
+import { loadFromStorage } from "../services/localstorage";
 import MovieCard from "../components/MovieCard";
 import { searchMovies } from "../services/api";
 function Favourites (){
