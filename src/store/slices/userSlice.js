@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { loadFromStorage, saveToStorage } from "../../services/localStorage";
+import { loadFromStorage, saveToStorage } from "../../services/localstorage";
 const userSlice = createSlice({
   name: "user",
   initialState: {
