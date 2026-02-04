@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { loadFromStorage, saveToStorage } from "../../services/localStorage";
-
 const userSlice = createSlice({
   name: "user",
   initialState: {
@@ -24,8 +23,10 @@ const userSlice = createSlice({
       const movieId = action.payload;
       if (state.favorites.includes(movieId)) {
         state.favorites = state.favorites.filter((id) => id !== movieId);
+        state.fav=false;
       } else {
         state.favorites.push(movieId);
+        state.fav=true;
       }
       saveToStorage("favorites", state.favorites);
     },

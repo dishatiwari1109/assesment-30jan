@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getMovieDetails } from "../services/api";
 import { getPosterUrl } from "../utils/helpers";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toggleFavorite, addToWatchlist } from "../store/slices/userSlice";
 import fav from "../assets/love.png";
 import bookmark from "../assets/save.png";
@@ -11,14 +11,15 @@ import saved from "../assets/saved.png";
 import LoadingSkeleton from "../components/LoadingSkeleton";
 
 export default function MovieDetails() {
+  const {favorites,watchlist}=useSelector((state)=>state.user);
   const { imdbID } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [favourite, setFavourite] = useState(fav);
-  const [watchlist, setWatchlist] = useState(bookmark);
+  const [favourite, setFavourite] = useState(favorites.includes(imdbID) ? liked : fav);
+  const [watchlistIcon, setWatchlistIcon] = useState(watchlist.includes(imdbID) ? saved : bookmark);
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
@@ -45,7 +46,7 @@ export default function MovieDetails() {
 
   const handleWatch = (id) => {
     dispatch(addToWatchlist(id));
-    setWatchlist(watchlist === bookmark ? saved : bookmark);
+    setWatchlistIcon(watchlistIcon === bookmark ? saved : bookmark);
   };
 
   if (loading) return <LoadingSkeleton />;
@@ -89,7 +90,6 @@ export default function MovieDetails() {
 
       <div className="bg-white rounded-lg shadow-lg overflow-hidden max-w-4xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-8">
-          {/* Poster */}
           <div className="md:col-span-1">
             <img
               src={getPosterUrl(movie.Poster)}
@@ -112,7 +112,7 @@ export default function MovieDetails() {
                 className="flex-1 flex items-center justify-center bg-indigo-100 hover:bg-indigo-200 rounded-lg p-3 transition"
               >
                 <img
-                  src={watchlist}
+                  src={watchlistIcon}
                   alt="Watchlist"
                   className="h-8 w-8"
                 />

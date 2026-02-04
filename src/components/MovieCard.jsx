@@ -10,16 +10,22 @@ import { toggleFavorite, addToWatchlist, removeFromWatchlist } from "../store/sl
 // import { useState } from "react";
 function MovieCard({ movie }) {
     const navigate = useNavigate();
-    const [favourite, setFavourite]=useState(fav);
-    const [watchlist, setWatchlist]=useState(bookmark);
+    const { favorites, watchlist } = useSelector((state) => state.user);
+    const [favourite,setFavourite]=useState(favorites.includes(movie.imdbID)?liked:fav);
+    const [watchlistIcon,setWatchlistIcon]=useState(watchlist.includes(movie.imdbID)?saved:bookmark);
     const dispatch = useDispatch();
     const handlefav=(id)=>{
         dispatch(toggleFavorite(id));
         favourite===fav?setFavourite(liked):setFavourite(fav);
     }
     const handlewatch=(id)=>{
-        dispatch(addToWatchlist(id));
-        watchlist===bookmark?setWatchlist(saved):setWatchlist(bookmark);
+        if(watchlist.includes(id)){
+            dispatch(removeFromWatchlist(id));
+        }
+        else{ 
+            dispatch(addToWatchlist(id));
+        }
+        watchlistIcon===bookmark?setWatchlistIcon(saved):setWatchlistIcon(bookmark);
     }
   return (
     <div className="max-w-sm rounded overflow-hidden shadow-lg m-4 cursor-pointer transition hover:shadow-xl">
@@ -41,7 +47,7 @@ function MovieCard({ movie }) {
               </button>
               <button onClick={()=>handlewatch(movie.imdbID)}>
               <img
-                src={watchlist}
+                src={watchlistIcon}
                 alt="Bookmark"
                 className="h-8 w-8 rounded-full bg-indigo-50 p-1 shadow-sm transition hover:scale-105"
               /> </button>
